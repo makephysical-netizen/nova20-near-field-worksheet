@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>NOVA20 near-field mounting geometry worksheet — pilot v0.2</title>
+<style>
+:root{color-scheme:light;font:16px/1.5 system-ui,-apple-system,sans-serif;color:#18343e;background:#f4f7f8}*{box-sizing:border-box}body{margin:0}main{max-width:1080px;margin:auto;padding:24px}header,section{background:#fff;border:1px solid #dae5e8;border-radius:12px;padding:20px;margin:0 0 16px}h1{font-size:clamp(1.5rem,4vw,2rem);line-height:1.15;margin:.3em 0}h2{font-size:1.2rem;margin:0 0 .5em}p{margin:.5em 0 1em}.eyebrow{color:#805006;font-weight:700;font-size:.85rem;letter-spacing:.03em}.lead{max-width:75ch}.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}label{display:block;font-size:.9rem;font-weight:600}label small{display:block;font-size:.78rem;font-weight:400;color:#526a73}input{display:block;width:100%;font:inherit;padding:.55rem;border:1px solid #9fb6bd;border-radius:6px;margin-top:.3rem}input:focus{outline:2px solid #1980a2;outline-offset:1px}.action{display:flex;gap:.7rem;flex-wrap:wrap;margin-top:15px}button{font:inherit;border:1px solid #246378;background:#246378;color:#fff;border-radius:6px;padding:.55rem .8rem;cursor:pointer}button.secondary{background:#fff;color:#246378}.summary{background:#e9f5f3;padding:12px;border-left:4px solid #23705e;border-radius:5px}.caution{background:#fff3df;padding:12px;border-left:4px solid #aa681e;border-radius:5px}.error{color:#a32424;font-weight:700}.table-wrap{overflow-x:auto}table{width:100%;border-collapse:collapse;min-width:650px;font-size:.9rem}th,td{padding:.55rem;border-bottom:1px solid #dce6e9;text-align:left}th{background:#edf3f5}tr.candidate{background:#edf8f1}svg{display:block;width:100%;height:auto;background:#f9fbfc;border:1px solid #dce6e9;border-radius:8px}a{color:#176182}code{background:#edf3f5;padding:.08em .3em;border-radius:3px}ol{padding-left:1.3em}li{margin:.35em 0}@media(max-width:720px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}main{padding:12px}}@media(max-width:440px){.grid{grid-template-columns:1fr}}@media print{body{background:white}main{max-width:none;padding:0}button{display:none}section,header{break-inside:avoid}}
+</style>
+</head>
+<body><main>
+<header>
+<div class="eyebrow">PILOT v0.2 · GEOMETRY ONLY · NO HARDWARE VALIDATION</div>
+<h1>NOVA20 near-field mounting geometry worksheet</h1>
+<p class="lead">Check whether nominal rays from a proposed mount could intersect a low object's vertical front face. Then verify the result with raw sensor readings. This worksheet does not predict detection probability, stopping distance, or safety.</p>
+</header>
+<section>
+<h2>Set the geometry</h2>
+<p>Use metres. The sensor fan must lie in the vertical plane of the target. Adjust the channel distribution to the installed unit if you have measured angles; the default uses evenly spaced nominal angles.</p>
+<div class="grid">
+<label>Sensor height above floor (m)<input id="height" type="number" value="0.30" min="0.01" max="5" step="0.01"></label>
+<label>Center tilt downward (°)<input id="tilt" type="number" value="30" min="-90" max="90" step="1"><small>0° is horizontal; positive points down.</small></label>
+<label>Vertical fan width (°)<input id="fan" type="number" value="40" min="0" max="180" step="1"><small>Nominal envelope only.</small></label>
+<label>Nominal channels<input id="channels" type="number" value="20" min="1" max="100" step="1"></label>
+<label>Shortest considered slant range (m)<input id="minimum" type="number" value="0.10" min="0" max="100" step="0.01"></label>
+<label>Longest considered slant range (m)<input id="maximum" type="number" value="1.00" min="0.01" max="100" step="0.01"><small>Default is the V2.1 10% reflectivity / 100 klux condition.</small></label>
+<label>Object front-face distance (m)<input id="objectDistance" type="number" value="0.50" min="0.01" max="100" step="0.01"><small>From the sensor's vertical projection.</small></label>
+<label>Object height above floor (m)<input id="objectHeight" type="number" value="0.10" min="0.001" max="5" step="0.01"></label>
+</div>
+<div class="action"><button id="reset" class="secondary" type="button">Reset example</button><button id="print" type="button">Print / save PDF</button></div>
+<p id="error" class="error" role="alert"></p>
+</section>
+<section>
+<h2>Geometry result</h2>
+<p id="summary" class="summary" aria-live="polite"></p>
+<svg id="diagram" viewBox="0 0 800 390" role="img" aria-label="Side-view ray geometry from a mounted sensor toward a low object"></svg>
+<p><small>Green rays cross the object's height band at its front face within the entered range. Blue rays do not. The drawing is schematic and does not represent beam width or target reflectivity.</small></p>
+<div class="table-wrap"><table><thead><tr><th>Channel</th><th>Downward angle</th><th>Ray height at object</th><th>Slant range to object</th><th>Flat-floor intersection</th><th>Geometry screen</th></tr></thead><tbody id="rows"></tbody></table></div>
+</section>
+<section>
+<h2>Turn this into an actual test</h2>
+<ol>
+<li>Mark the planned sensor position and target distance on the robot and floor. Check for vehicle-body occlusion.</li>
+<li>At several distances and with representative low targets, log each channel's raw range and signal strength, including invalid returns. Note target material, ambient light and pose.</li>
+<li>Compare the measured channel directions with this nominal drawing. Test the robot's filtering, control loop and stopping distance separately.</li>
+</ol>
+<p class="caution"><strong>Limits:</strong> This assumes a flat floor, a vertical target face, evenly spaced nominal rays and no beam width. It ignores reflectivity, sunlight, multipath, sensor noise and mechanical occlusion. A crossing means only that a ray is geometrically possible. It is not an obstacle-detection or safe-stop claim. The NOVA20 V2.1 datasheet does not state an enclosure protection rating.</p>
+<p>Default product inputs are planning values from the <a href="https://ai.benewake.com/en/resources/technical-documents/nova20-datasheet/">official NOVA20 Datasheet V2.1</a>: 20 nominal channels, field of view up to 40°, blind zone at most 0.1 m and 1 m range under the stated low-reflectivity/high-ambient-light condition. Check the latest product documentation before making a design decision. <a href="https://ai.benewake.com/en/products/nova20/">NOVA20 product page</a> · <a href="https://ai.benewake.com/en/contact/">Technical / sample inquiry</a>.</p>
+</section>
+</main>
+<script>
+const DEFAULTS={height:.30,tilt:30,fan:40,channels:20,minimum:.10,maximum:1,objectDistance:.50,objectHeight:.10};
+function geometry(o){const {height:h,tilt,fan,channels:n,minimum:min,maximum:max,objectDistance:d,objectHeight:top}=o;
+ if(![h,tilt,fan,n,min,max,d,top].every(Number.isFinite)||h<=0||h>5||!Number.isInteger(n)||n<1||n>100||tilt < -90||tilt>90||fan<0||fan>180||min<0||max<=min||d<=0||d>100||top<=0||top>5)throw Error('Enter valid positive heights and distance, a whole channel count, angles within the shown limits, and maximum range greater than minimum.');
+ const rays=[];for(let i=0;i<n;i++){
+  const angle=tilt+(n===1?0:(i/(n-1)-.5)*fan),rad=angle*Math.PI/180;
+  const forward=Math.abs(angle)<90,rangeAtFace=forward?d/Math.cos(rad):null;
+  const heightAtFace=forward?h-d*Math.tan(rad):null;
+  const floorX=angle>0&&angle<=90?(angle===90?0:h/Math.tan(rad)):null;
+  const floorRange=angle>0&&angle<=90?h/Math.sin(rad):null;
+  const candidate=forward&&heightAtFace>=0&&heightAtFace<=top&&rangeAtFace>=min&&rangeAtFace<=max;
+  let reason='Height band and range overlap';
+  if(!forward)reason='No forward intersection';else if(heightAtFace<0)reason='Floor before object';else if(heightAtFace>top)reason='Above object';else if(rangeAtFace<min)reason='Inside entered minimum';else if(rangeAtFace>max)reason='Beyond entered maximum';
+  rays.push({channel:i+1,angle,heightAtFace,rangeAtFace,floorX,floorRange,candidate,reason});
+ }return rays;
+}
+function getInputs(){const o={};for(const key of Object.keys(DEFAULTS)){const el=document.getElementById(key);o[key]=el.value.trim()===''?NaN:Number(el.value)}return o}
+function m(v){return v===null?'—':v.toFixed(3)+' m'}
+function draw(svg,o,rays){svg.replaceChildren();const NS='http://www.w3.org/2000/svg',maxX=Math.max(1.1,o.objectDistance*1.25,Math.min(2,o.maximum*1.2)),maxZ=Math.max(.6,o.height*1.3,o.objectHeight*1.4),px=x=>55+x/maxX*705,py=z=>345-z/maxZ*290;
+ function element(tag,attrs){const e=document.createElementNS(NS,tag);for(const [k,v] of Object.entries(attrs))e.setAttribute(k,String(v));svg.appendChild(e);return e}
+ element('line',{x1:42,y1:345,x2:770,y2:345,stroke:'#345665','stroke-width':2});
+ for(const r of rays){if(Math.abs(r.angle)>=90)continue;let endX=maxX;if(r.floorX!==null)endX=Math.min(endX,r.floorX);const endZ=Math.max(0,o.height-endX*Math.tan(r.angle*Math.PI/180));element('line',{x1:px(0),y1:py(o.height),x2:px(endX),y2:py(endZ),stroke:r.candidate?'#168452':'#9eb9c6','stroke-width':r.candidate?2.3:1.1,opacity:r.candidate?1:.65})}
+ element('rect',{x:px(o.objectDistance)-5,y:py(o.objectHeight),width:10,height:py(0)-py(o.objectHeight),fill:'#d47822'});
+ element('circle',{cx:px(0),cy:py(o.height),r:6,fill:'#123b53'});
+ const t=element('text',{x:px(o.objectDistance)+9,y:py(o.objectHeight)-6,fill:'#6b3e16','font-size':15});t.textContent='object';
+ const s=element('text',{x:px(0)+9,y:py(o.height)-9,fill:'#123b53','font-size':15});s.textContent='sensor';
+ const f=element('text',{x:660,y:370,fill:'#345665','font-size':14});f.textContent='flat floor';
+}
+function render(){const error=document.getElementById('error'),body=document.getElementById('rows'),summary=document.getElementById('summary'),svg=document.getElementById('diagram');error.textContent='';body.replaceChildren();svg.replaceChildren();
+ try{const o=getInputs(),rays=geometry(o),hits=rays.filter(r=>r.candidate);summary.textContent=`${hits.length} of ${rays.length} nominal rays cross the object's vertical front-face height band within the entered slant-range window. This is a geometry screen only.`;
+ for(const r of rays){const tr=document.createElement('tr');if(r.candidate)tr.className='candidate';for(const v of [r.channel,r.angle.toFixed(1)+'°',m(r.heightAtFace),m(r.rangeAtFace),m(r.floorX),r.reason]){const td=document.createElement('td');td.textContent=v;tr.appendChild(td)}body.appendChild(tr)}draw(svg,o,rays)}
+ catch(e){error.textContent=e.message;summary.textContent='No result until the inputs are valid.'}}
+for(const el of document.querySelectorAll('input'))el.addEventListener('input',render);
+document.getElementById('reset').addEventListener('click',()=>{for(const [key,value] of Object.entries(DEFAULTS))document.getElementById(key).value=value;render()});
+document.getElementById('print').addEventListener('click',()=>window.print());
+render();
+</script>
+</body></html>

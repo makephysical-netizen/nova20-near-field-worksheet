@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Evaluating low objects with NOVA20 — pilot guide</title>
+<style>body{font:16px/1.55 system-ui,-apple-system,sans-serif;background:#f4f7f8;color:#193741;margin:0}main{max-width:860px;margin:auto;padding:24px}header,section{background:white;border:1px solid #dce6e9;border-radius:12px;padding:20px;margin:0 0 16px}h1{font-size:clamp(1.5rem,4vw,2rem);line-height:1.2}h2{font-size:1.2rem}p{max-width:75ch}table{border-collapse:collapse;width:100%}th,td{border-bottom:1px solid #dce6e9;padding:.6rem;text-align:left;vertical-align:top}th{background:#edf3f5}.scroll{overflow-x:auto}.warn{background:#fff2dd;border-left:4px solid #a96713;padding:12px}.tag{color:#805006;font-weight:700;font-size:.85rem}a{color:#176182}code{background:#edf3f5;padding:.08rem .25rem;border-radius:3px}li{margin:.4rem 0}@media(max-width:600px){main{padding:12px}.scroll table{min-width:650px}}</style></head><body><main>
+<header><div class="tag">PILOT GUIDE v0.1 · NO HARDWARE VALIDATION</div>
+<h1>Evaluating low objects with NOVA20</h1>
+<p>If a robot's existing sensor misses low objects, start with a measurable question: <strong>at which positions do you need a reliable distance input?</strong> A second sensor is useful only if its rays can reach those positions and its data add information the current system lacks.</p>
+<p>This short worksheet helps plan a bench test. It does not claim that NOVA20 will detect a particular obstacle or make a robot safe.</p></header>
+<section><h2>1. Draw the missing region</h2>
+<p>In robot coordinates, mark the object height, front-face distance and lateral position that the current system misses. Record the current sensor's mounting height and the robot body that may block its view. Note whether the issue is a true measurement gap or a software filtering/configuration problem.</p>
+<p>For NOVA20, the <a href="https://ai.benewake.com/en/resources/technical-documents/nova20-datasheet/">V2.1 datasheet</a> describes 20 channel-tagged distance readings across a field of view of up to 40°, at 10 Hz. Its stated 1 m range applies to the specified 10% reflectivity and 100 klux condition. That is enough to plan a short-range trial, not to infer detection probability or stopping performance.</p>
+<p><a href="index.html">Try the mounting geometry worksheet</a> to reject obvious placement mistakes. The tool estimates nominal ray crossings with a low object's height band; it is not an optical or safety model.</p></section>
+<section><h2>2. Make one repeatable measurement</h2>
+<ol><li>Fix the robot or sensor on a bench. Use a ruler or marked floor to set several known object distances, including positions just outside the expected range.</li>
+<li>Use a low object representative of the real task. Repeat with at least one dark or low-reflectivity surface and the expected ambient light. Keep the target pose and sensor mount fixed for each series.</li>
+<li>Log raw channel ID, range, signal strength, invalid/missing returns, host timestamp and target distance. Do not collapse all channels into one “detected” flag yet.</li>
+<li>Repeat at nearby lateral positions, then test with the full robot body installed to expose occlusion. Compare with the current sensor at the same positions.</li></ol>
+<div class="scroll"><table><thead><tr><th>Record</th><th>Why it matters</th></tr></thead><tbody>
+<tr><td>Object height, distance, lateral offset</td><td>Separates a real geometric gap from a vaguely described “blind spot”.</td></tr>
+<tr><td>Mount height, tilt, fan orientation</td><td>Determines whether nominal rays can reach the target.</td></tr>
+<tr><td>Raw channel ID, distance, strength, invalid return</td><td>Shows which channels actually contribute and where returns disappear.</td></tr>
+<tr><td>Target material, ambient light, body occlusion</td><td>Reveals conditions that a drawing alone cannot predict.</td></tr>
+<tr><td>Current sensor output and robot decision</td><td>Tests whether NOVA20 adds information before changing the control logic.</td></tr>
+</tbody></table></div>
+</section>
+<section><h2>3. Decide what the test established</h2>
+<p>A useful result is a map of positions where the new raw channel data are present and the existing sensor has no useful reading. If both sensors return data but the robot still misses the object, inspect calibration, filtering and decision thresholds before assuming another sensor is needed.</p>
+<p class="warn"><strong>Keep the boundary clear.</strong> Twenty angular samples are not a full 3D scene. Range, accuracy and frame rate are specified under stated conditions; they do not establish object classification, obstacle avoidance performance or safe stopping. The V2.1 datasheet gives no enclosure protection rating. Outdoor use needs a separate enclosure and environmental evaluation.</p>
+<p>For wiring, frame parsing and pin assignments, follow the current official user manual for your hardware revision; this draft deliberately does not guess those details. To obtain the current documentation or ask about a sample, use the <a href="https://ai.benewake.com/en/products/nova20/">NOVA20 product page</a> or <a href="https://ai.benewake.com/en/contact/">Benewake contact page</a>. Availability and lead time require confirmation from Benewake.</p>
+</section>
+<p><small>Source: Benewake NOVA20 Datasheet V2.1, linked above. This page is an independent evaluation guide and does not reproduce the datasheet. Revise it if the official specifications change.</small></p>
+</main></body></html>
