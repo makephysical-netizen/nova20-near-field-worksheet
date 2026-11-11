@@ -4,7 +4,9 @@
 
 This small, dependency-free browser worksheet helps a robot developer reject obviously unsuitable near-field sensor placements. Enter the proposed NOVA20 mounting height, downward tilt, target height and distance. The page reports which evenly spaced nominal rays could cross the target's vertical front-face height band within the entered slant-range window.
 
-Open `index.html` in a browser. No account, server, telemetry or network request is needed for the calculation. The companion `guide.html` describes a repeatable low-object bench test and the raw data to record.
+**Use it online:** [open the geometry worksheet](https://makephysical-netizen.github.io/nova20-near-field-worksheet/) and [read the bench-test guide](https://makephysical-netizen.github.io/nova20-near-field-worksheet/guide.html).
+
+You can also download this repository and open `index.html` locally. The calculation runs in the browser without an account, telemetry or a network request. The companion `guide.html` describes a repeatable low-object bench test and the raw data to record.
 
 ## What the result means
 
