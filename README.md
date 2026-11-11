@@ -23,6 +23,19 @@ The defaults use the [official NOVA20 Datasheet V2.1](https://ai.benewake.com/en
 
 The [NOVA20 product page](https://ai.benewake.com/en/products/nova20/) and [Benewake contact page](https://ai.benewake.com/en/contact/) are the current official paths for product information and technical or sample inquiries. Availability and lead time require confirmation.
 
+## Optional raw UART capture
+
+`capture_raw.py` records the bytes received on a serial port without interpreting frames. A short capture can help compare real hardware output with a protocol document before anyone relies on a driver. It does **not** decode distances, channel angles, signal strength or validity flags, and it has not been tested with a physical NOVA20.
+
+First confirm the exact pinout, voltage levels, wiring and port for your hardware revision using the applicable manual. Then install [pyserial](https://pyserial.readthedocs.io/) and capture to a new file:
+
+```sh
+python3 -m pip install pyserial
+python3 capture_raw.py --port /dev/ttyUSB0 --output nova20_capture.bin --seconds 10
+```
+
+The default baud rate is 921600, as listed on the current NOVA20 product page; pass `--baudrate` if your device is configured differently. Existing output files are never overwritten. The file may contain device or project information: review it before sharing publicly. A zero-byte file means the serial connection produced no bytes during the capture window, not that the sensor is defective.
+
 ## Status and feedback
 
 This is an early geometry worksheet, not a certified avoidance tool or a tested driver. Please open an Issue in this repository if the explanation or calculation is unclear; include the input values and the result you expected. Do not post private robot logs or customer information.
